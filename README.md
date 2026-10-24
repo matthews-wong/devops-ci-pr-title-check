@@ -22,3 +22,22 @@ scripts/check-pr-title.sh "feat(api): add retry budget"
 ```
 
 Exit status is 0 for a valid title and 1 otherwise, with the reason on stderr.
+
+## Workflow
+
+`.github/workflows/pr-title.yml` runs on `opened`, `edited`, `synchronize` and
+`reopened`, so renaming a PR re-runs the check. The title reaches the script
+through an environment variable instead of being expanded into the shell
+command, because a PR title is attacker-controlled input.
+
+To block merging on a bad title, mark the `check` job as a required status
+check in the branch protection settings.
+
+## Validation
+
+```sh
+make validate   # actionlint + shellcheck, then the title tests
+```
+
+`actionlint` and `shellcheck` must be on `PATH`; `scripts/install-actionlint.sh`
+installs a pinned, checksum-verified actionlint for Linux amd64.
